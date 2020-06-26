@@ -1,5 +1,3 @@
-package exrcesises.class11;
-
 import org.openqa.selenium.By;
 
 public class WebCalculatorPage {
