@@ -1,5 +1,3 @@
-package exrcesises.class11;
-
 import java.util.Date;
 
 //5
