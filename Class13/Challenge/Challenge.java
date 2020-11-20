@@ -1,29 +1,44 @@
-import io.restassured.path.json.JsonPath;
+import io.appium.java_client.MobileElement;
+import io.appium.java_client.android.AndroidDriver;
+import io.appium.java_client.remote.MobileCapabilityType;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.openqa.selenium.remote.DesiredCapabilities;
 
-import java.util.ArrayList;
-
-import static io.restassured.RestAssured.get;
+import java.io.IOException;
+import java.net.URL;
+import java.util.concurrent.TimeUnit;
 
 public class Challenge {
-    public static void main(String[] args) {
-        countriesAPIAssured();
-        ratesAPIAssured();
+    private static AndroidDriver<MobileElement> driver;
+
+    // 1 + 2
+    // Appium is an open source test automation framework for use with native, hybrid and mobile web apps.
+    //It drives iOS, Android, and Windows apps using the WebDriver protocol.
+    // 3
+    @BeforeClass
+    public static void setUp() throws IOException {
+        DesiredCapabilities capabilities = new DesiredCapabilities();
+        capabilities.setCapability(MobileCapabilityType.PLATFORM_NAME, "Android");
+        capabilities.setCapability(MobileCapabilityType.DEVICE_NAME, "Android Device");
+        capabilities.setCapability("appPackage", "com.android.chrome");
+        capabilities.setCapability("appActivity", "com.google.android.apps.chrome.Main");
+        capabilities.setCapability(MobileCapabilityType.NEW_COMMAND_TIMEOUT, 120);
+        capabilities.setCapability(MobileCapabilityType.NO_RESET, true);
+        driver = new AndroidDriver(new URL("http://0.0.0.0:4723/wd/hub/"), capabilities);
+
+        driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
     }
 
-    private static void countriesAPIAssured() {
-        String URL = "https://restcountries.eu/rest/v2/name/israel";
-        JsonPath responseBody = get(URL).body().jsonPath();
-        String region = responseBody.get("region[0]");
-        ArrayList<String> callingCodes = responseBody.get("callingCodes[0]");
-        String borders = responseBody.getString("borders[0]");
-        String symbol = responseBody.getString("currencies.symbol");
-
-        System.out.println(region + " " + callingCodes.get(0) + " " + borders + " " + symbol);
+    @Test
+    public void test1_getSource() {
+        System.out.println(driver.getPageSource());
     }
 
-    private static void ratesAPIAssured() {
-        String URL = "https://api.exchangeratesapi.io/latest?base=USD";
-        float value = get(URL).body().path("rates.ILS");
-        System.out.println(value * 3);
+
+    @AfterClass
+    public static void tearDown(){
+        driver.quit();
     }
 }

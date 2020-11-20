@@ -1,165 +1,141 @@
-import com.paulhammant.ngwebdriver.ByAngular;
-import com.paulhammant.ngwebdriver.NgWebDriver;
+import com.example.JSUtils;
+import exrcesises.class11.DriverSingleton;
+import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.*;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
+import org.openqa.selenium.interactions.Actions;
+import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 
-import java.time.Duration;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
-
-import static org.testng.Assert.assertEquals;
 
 public class Solution {
     private static WebDriver driver;
-    private static NgWebDriver ngWebDriver;
 
     @BeforeClass
     public static void beforeAll() {
         driver = DriverSingleton.getDriverInstance();
-        ngWebDriver = new NgWebDriver((JavascriptExecutor) driver);
-        driver.get("https://dgotlieb.github.io/Selenium/synchronization.html");
+        driver.get("https://dgotlieb.github.io/Navigation/Navigation.html");
         driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
     }
 
     //1
     @Test
-    public void Test01_ImplicitWait() {
-        // Implicit Wait
-        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-        driver.findElement(By.id("checkbox")).isDisplayed();
-        driver.findElement(By.id("btn")).click();
-        driver.findElement(By.id("message")).isDisplayed();
-    }
-
-    @Test
-    public void Test02_Sleep() throws InterruptedException {
-        // Sleep
-        driver.findElement(By.id("hidden")).click();
-        Thread.sleep(10000);
-        driver.findElement(By.cssSelector("div[style='']")).isDisplayed();
-    }
-
-    @Test
-    public void Test03_ExplicitWait() {
-        // Explicit Wait
-        driver.findElement(By.id("rendered")).click();
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("finish2")));
-        String output = driver.findElement(By.id("finish2")).getText();
-        assertEquals(output, "This is a new element");
+    public void Test01_iFrame() {
+        WebElement iFrameElement = driver.findElement(By.cssSelector("iframe[src='newFrame.html']"));
+        driver.switchTo().frame(iFrameElement);
+        System.out.println("IFrame text is: " + driver.findElement(By.id("iframe_container")).getText());
+        driver.switchTo().defaultContent();
+        Assert.assertEquals("Navigation", driver.findElement(By.id("title")).getText());
     }
 
     //2
     @Test
-    public void Test04_angularTest() {
-        driver.navigate().to("https://dgotlieb.github.io/AngularJS/main.html");
-        ngWebDriver.waitForAngularRequestsToFinish();
-        WebElement firstname = driver.findElement(ByAngular.model("firstName"));
-        firstname.clear();
-        firstname.sendKeys("Daniel");
-        assertEquals(driver.findElement(By.xpath("//input")).getAttribute("value"), "Daniel");
+    public void test02_dragAndDrop() {
+        driver.navigate().to("https://dgotlieb.github.io/Actions/");
+        WebElement locationElement = driver.findElement(By.id("drag1"));
+        WebElement destinationElement = driver.findElement(By.id("div1"));
+        File screenShotFile = destinationElement.getScreenshotAs(OutputType.FILE);
+        try {
+            FileUtils.copyFile(screenShotFile, new File("element-screenshot.png"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        JSUtils.JavascriptDragAndDrop(driver, locationElement, destinationElement);
+    }
+
+    @Test
+    public void test03_doubleClick() {
+        WebElement doubleClickElement =
+                driver.findElement(By.xpath("//p[@ondblclick='doubleClickFunction()']"));
+        Actions doubleClickAction = new Actions(driver);
+        doubleClickAction.doubleClick(doubleClickElement);
+        doubleClickAction.build().perform();
+
+        String result = driver.findElement(By.id("demo")).getText();
+        Assert.assertEquals("You double clicked", result);
+    }
+
+    @Test
+    public void test04_mosueHover() {
+        Actions hoverAction = new Actions(driver);
+        WebElement firstHoverElement = driver.findElement(By.id("demo"));
+        WebElement secondHoverElement = driver.findElement(By.id("close"));
+        hoverAction.moveToElement(firstHoverElement)
+                .moveToElement(secondHoverElement)
+                .click()
+                .build()
+                .perform();
+    }
+
+    @Test
+    public void test05_selectMultiple() {
+        List<WebElement> elementsList = driver.findElements(By.name("kind"));
+        Actions builder = new Actions(driver);
+        builder.clickAndHold(elementsList.get(0)).clickAndHold(elementsList.get(2)).click();
+        builder.build().perform();
+    }
+
+    @Test
+    public void test06_uploadFile() {
+        driver.findElement(By.name("pic")).sendKeys("1.txt");
+    }
+
+    @Test
+    public void test07_scrollToElement() throws InterruptedException {
+        WebElement element = driver.findElement(By.id("clickMe"));
+        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", element);
+        Thread.sleep(4000);
+    }
+
+    @Test
+    public void test08_scrollToLocation() throws InterruptedException {
+        JavascriptExecutor js = (JavascriptExecutor) driver;
+        js.executeScript("javascript:window.scrollBy(250,350)");
+        Thread.sleep(4000); // this is here just to see the move after the scroll
     }
 
     //3
     @Test
-    public void Test05_alert() {
-        driver.navigate().to("https://dgotlieb.github.io/Navigation/Navigation.html");
-        driver.findElement(By.id("MyAlert")).click();
-        Alert alert = driver.switchTo().alert();
-        System.out.println(alert.getText());
-        alert.accept();
+    public void test09_XML() {
+        driver.navigate().to(getData("URL"));
     }
 
-    @Test
-    public void Test06_prompt() {
-        driver.findElement(By.id("MyPrompt")).click();
-        Alert prompt = driver.switchTo().alert();
-        prompt.sendKeys("Daniel");
-        prompt.accept();
-        String output = "Daniel";
-        assertEquals(output, driver.findElement(By.id("output")).getText());
-    }
-
-    @Test
-    public void Test07_confirmBox() {
-        driver.findElement(By.id("MyConfirm")).click();
-        Alert confirmbox = driver.switchTo().alert();
-        confirmbox.accept();
-        String output = "Confirmed";
-        assertEquals(output, driver.findElement(By.id("output")).getText());
-        driver.findElement(By.id("MyConfirm")).click();
-        confirmbox.dismiss();
-        output = "canceled";
-        assertEquals(output, driver.findElement(By.id("output")).getText());
-    }
-
-    @Test
-    public void Test08_iFrame() {
-        WebElement iFrameElement = driver.findElement(By.cssSelector("iframe[src='newFrame.html']"));
-        driver.switchTo().frame(iFrameElement);
-        System.out.println("IFrame text is:" + driver.findElement(By.id("iframe_container")).getText());
-        driver.switchTo().defaultContent();
-        assertEquals("Navigation", driver.findElement(By.id("title")).getText());
-    }
-
-    @Test
-    public void Test09_HandlingTabs() {
-        String oldTab = driver.getWindowHandle();
-        driver.findElement(By.id("openNewTab")).click();
-        ArrayList<String> newTab = new ArrayList<String>(driver.getWindowHandles());
-        newTab.remove(oldTab);
-        driver.switchTo().window(newTab.get(0));
-
-        System.out.println("Tab text is: " + driver.findElement(By.id("new_tab_container")).getText());
-        String output = "This is a new Tab";
-        assertEquals(output, driver.findElement(By.id("new_tab_container")).getText());
-        driver.close();
-        driver.switchTo().window(oldTab);
-        assertEquals("Navigation", driver.findElement(By.id("title")).getText());
-    }
-
-    @Test
-    public void Test10_windows() {
-        String winHandleBefore = driver.getWindowHandle();
-        driver.findElement(By.cssSelector("a[href='newWindow.html']")).click();
-        for (String winHandle : driver.getWindowHandles()) { //Switch to new window opened
-            driver.switchTo().window(winHandle);
+    private static String getData (String keyName) {
+        // todo change path to the XML file
+        File configXmlFile = new File("C:\\Users\\...\\class12\\config.xml");
+        DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder dBuilder = null;
+        try {
+            dBuilder = dbFactory.newDocumentBuilder();
+        } catch (ParserConfigurationException e) {
+            e.printStackTrace();
         }
-        System.out.println("Tab text is: " + driver.findElement(By.id("new_window_container")).getText());
-        String output = "This is a new Window";
-        assertEquals(output, driver.findElement(By.id("new_window_container")).getText());
-        driver.close();
-        driver.switchTo().window(winHandleBefore);
-        assertEquals("Navigation", driver.findElement(By.id("title")).getText());
-    }
-
-    //4
-    // the pageLoadTimeout limits the time that the script allots for a web page to be displayed
-
-    //5 + 6
-    @Test
-    public void Test11_use_utils() {
-        System.out.println(Utils.getCurrentDate());
-        System.out.println(Utils.getOS());
-    }
-
-    //7
-    @Test
-    public void Test12_POM() throws InterruptedException {
-        driver.get("https://dgotlieb.github.io/WebCalculator");
-        System.out.println(driver.findElement(By.id(Constants.SEVEN)).getSize());
-        System.out.println(driver.findElement(By.id("six")).isDisplayed());
-        WebCalculatorPage.pressFive();
-        WebCalculatorPage.pressPlus();
-        WebCalculatorPage.pressFive();
-        WebCalculatorPage.pressEquals();
-        Thread.sleep(1000);
-        String expectedResult = "10";
-        assertEquals(expectedResult, WebCalculatorPage.getResult());
+        Document doc = null;
+        try {
+            assert dBuilder != null;
+            doc = dBuilder.parse(configXmlFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (SAXException e) {
+            e.printStackTrace();
+        }
+        if (doc != null) {
+            doc.getDocumentElement().normalize();
+        }
+        assert doc != null;
+        return doc.getElementsByTagName(keyName).item(0).getTextContent();
     }
 
     @AfterClass

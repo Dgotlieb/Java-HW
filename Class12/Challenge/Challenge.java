@@ -1,64 +1,29 @@
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
+import io.restassured.path.json.JsonPath;
 
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.List;
-import java.util.Set;
+import java.util.ArrayList;
+
+import static io.restassured.RestAssured.get;
 
 public class Challenge {
-    private static WebDriver driver;
-    private String jsonPath = "C:\\Users\\dgotl\\IdeaProjects\\JavaHomeWorkSolutions\\src\\main\\java\\challenges\\class12\\data.json";
-
-    @BeforeClass
-    public static void setUP(){
-        driver = new ChromeDriver();
+    public static void main(String[] args) {
+        countriesAPIAssured();
+        ratesAPIAssured();
     }
 
-    @Test
-    public void test06_HandlingTabs() {
-        driver.get("https://www.google.com");
-        String googleTab = driver.getWindowHandle();
-        ((JavascriptExecutor)driver).executeScript("window.open('https://www.youtube.com','_blank');");
-        String youtubeTab = driver.getWindowHandle();
-        ((JavascriptExecutor)driver).executeScript("window.open('https://translate.google.com','_blank');");
-        driver.switchTo().window(googleTab);
-        driver.switchTo().window(youtubeTab);
+    private static void countriesAPIAssured() {
+        String URL = "https://restcountries.eu/rest/v2/name/israel";
+        JsonPath responseBody = get(URL).body().jsonPath();
+        String region = responseBody.get("region[0]");
+        ArrayList<String> callingCodes = responseBody.get("callingCodes[0]");
+        String borders = responseBody.getString("borders[0]");
+        String symbol = responseBody.getString("currencies.symbol");
+
+        System.out.println(region + " " + callingCodes.get(0) + " " + borders + " " + symbol);
     }
 
-    //7
-    @Test
-    public void test07_JSON() throws IOException, ParseException {
-       driver.get(getURLFromJSON());
-    }
-
-    //8
-    @Test
-    public void test08_gson() throws IOException, ParseException {
-        Gson gson = new Gson();
-        Config config = gson.fromJson(new FileReader(jsonPath), Config.class);
-        driver.get(config.getURL());
-    }
-
-    private String getURLFromJSON() throws IOException, ParseException {
-        JSONParser parser = new JSONParser();
-        JSONObject data = (JSONObject) parser.parse(new FileReader(jsonPath));
-        String URL = (String) data.get("URL");
-
-        return URL;
-    }
-
-    @AfterClass
-    public void afterAll() {
-         driver.quit();
+    private static void ratesAPIAssured() {
+        String URL = "https://api.exchangeratesapi.io/latest?base=USD";
+        float value = get(URL).body().path("rates.ILS");
+        System.out.println(value * 3);
     }
 }
