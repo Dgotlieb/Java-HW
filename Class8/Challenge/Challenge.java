@@ -1,25 +1,24 @@
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-public class ThreadSafeSingleton {
-    private static ThreadSafeSingleton instance;
+public class Challenge {
+    public static void main(String[] args) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        //10
+        User user = new User("daniel");
+        Method privateStringMethod = User.class.getDeclaredMethod("getName");
+                privateStringMethod.setAccessible(true);
+        String name = (String) privateStringMethod.invoke(user);
+        System.out.println(name);
 
-    private ThreadSafeSingleton(){}
-
-    //synchronized method to control simultaneous access
-    synchronized public static ThreadSafeSingleton getInstance() {
-        if (instance == null) {
-            // if instance is null, initialize
-            instance = new ThreadSafeSingleton();
-        }
-
-        return instance;
-    }
-
-    public void writeToFile(String content) throws IOException {
-        String filePath = "C:\\Users\\user\\log.txt";
-        Files.writeString(Path.of(filePath), content + "\n", StandardOpenOption.APPEND);
+        //11
+        String REGEX = "dog";
+        String INPUT = "The dog says meow. All dogs say meow.";
+        String REPLACE = "cat";
+        Pattern p = Pattern.compile(REGEX);
+        Matcher m = p.matcher(INPUT);
+        INPUT = m.replaceAll(REPLACE);
+        System.out.println(INPUT);
     }
 }
