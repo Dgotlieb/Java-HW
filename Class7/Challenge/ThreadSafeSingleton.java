@@ -3,7 +3,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 
-// 8
 public class ThreadSafeSingleton {
     private static ThreadSafeSingleton instance;
 
@@ -23,13 +22,4 @@ public class ThreadSafeSingleton {
         String filePath = "C:\\Users\\user\\log.txt";
         Files.writeString(Path.of(filePath), content + "\n", StandardOpenOption.APPEND);
     }
-	
-	//9
-	Adapter Pattern - An Adapter Pattern says that just "converts the interface of a class into another interface that a client wants".
-	Bridge Pattern - A Bridge Pattern says that just "decouple the functional abstraction from the implementation so that the two can vary independently".
-	Observer Pattern - An Observer Pattern says that "just define a one-to-one dependency so that when one object changes state, all its dependents are notified and updated automatically".
-	
-	//10
-	1. Ant 
-	2. Gradle
 }
