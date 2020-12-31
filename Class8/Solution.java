@@ -40,40 +40,26 @@ public class Solution {
         }
 
         //4
-        User user = new User("daniel", "123", 10);
-        try {
-            FileOutputStream fileOut =
-                    new FileOutputStream(new File(".").getAbsolutePath() + "\\user.ser");
-            ObjectOutputStream out = new ObjectOutputStream(fileOut);
-            out.writeObject(user);
-            out.close();
-            fileOut.close();
-            System.out.println("Serialized data is saved");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        //5
         // Generics allow us to customize a "generic" method or class to whatever type
         // we are working with.
 
-        //6
+        //5
         printAnyElement(1);
         printAnyElement("sdvs");
         printAnyElement(true);
 
-        //7
+        //6
         // calculate2() abuses YAGNI & DRY principals
         // superCalculate() abuses YAGNI principal
 
-        //8
+        //7
         String dictionary = "Dictionary";
         StringBuilder strBuilder2 = new StringBuilder(dictionary);
         int aIndex = strBuilder2.indexOf("a");
         strBuilder2.replace( aIndex, aIndex + 1, "x");
         System.out.println(strBuilder2.toString());
 
-        //9
+        //8
         Method[] allMethods = String.class.getDeclaredMethods();
         int totalPublicMethods = 0;
         for (Method method : allMethods) {
