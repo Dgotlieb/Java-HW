@@ -5,14 +5,14 @@ import java.util.regex.Pattern;
 
 public class Challenge {
     public static void main(String[] args) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        //10
+        //9
         User user = new User("daniel");
         Method privateStringMethod = User.class.getDeclaredMethod("getName");
                 privateStringMethod.setAccessible(true);
         String name = (String) privateStringMethod.invoke(user);
         System.out.println(name);
 
-        //11
+        //10
         String REGEX = "dog";
         String INPUT = "The dog says meow. All dogs say meow.";
         String REPLACE = "cat";
