@@ -137,6 +137,41 @@ public class Solution {
         assert doc != null;
         return doc.getElementsByTagName(keyName).item(0).getTextContent();
     }
+    
+    // 4+5 in Report file
+    
+    //6
+    @Test
+    public void Test10_alert() {
+        driver.navigate().to("https://dgotlieb.github.io/Navigation/Navigation.html");
+        driver.findElement(By.id("MyAlert")).click();
+        Alert alert = driver.switchTo().alert();
+        System.out.println(alert.getText());
+        alert.accept();
+    }
+
+    @Test
+    public void Test11_prompt() {
+        driver.findElement(By.id("MyPrompt")).click();
+        Alert prompt = driver.switchTo().alert();
+        prompt.sendKeys("Daniel");
+        prompt.accept();
+        String output = "Daniel";
+        assertEquals(output, driver.findElement(By.id("output")).getText());
+    }
+
+    @Test
+    public void Test12_confirmBox() {
+        driver.findElement(By.id("MyConfirm")).click();
+        Alert confirmbox = driver.switchTo().alert();
+        confirmbox.accept();
+        String output = "Confirmed";
+        assertEquals(output, driver.findElement(By.id("output")).getText());
+        driver.findElement(By.id("MyConfirm")).click();
+        confirmbox.dismiss();
+        output = "canceled";
+        assertEquals(output, driver.findElement(By.id("output")).getText());
+    }
 
     @AfterClass
     public void afterAll() {
