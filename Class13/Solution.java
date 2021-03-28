@@ -47,21 +47,6 @@ public class Solution {
         robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
     }
 
-    @Test
-    public void test03_cookies(){
-        ChromeDriver driver = new ChromeDriver();
-        driver.get("https://www.google.com");
-        System.out.println(driver.manage().getCookies());
-        driver.manage().deleteCookieNamed("account");
-        System.out.println(driver.manage().getCookies());
-    }
+// mvn -Dtest=<CLASS NAME>#<TEST NAME> test
 
-    @Test
-    public void test04_download(){
-        ChromeOptions options = new ChromeOptions();
-        Map<String, Object> prefs = new HashMap<String, Object>();
-        prefs.put("download.default_directory", "/directory/path");
-        options.setExperimentalOption("prefs", prefs);
-        ChromeDriver driver = new ChromeDriver(options);
-    }
 }
