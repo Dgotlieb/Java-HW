@@ -28,6 +28,15 @@ public class Solution {
         //4
         Drivable car = CarFactory.getCar("BMW");
         car.drive();
+        
+        //5
+        // from terminal tun: git clone https://github.com/SeleniumHQ/selenium.git
+        
+        //6
+        // https://github.com/Dgotlieb/Java-HW
+        
+        //7
+        // https://www.cloudrepo.io/articles/what-is-a-maven-repository.html
 
     }
 }
